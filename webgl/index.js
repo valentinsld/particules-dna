@@ -38,6 +38,8 @@ export default class WebGL extends EventEmitter {
 
     this.started = true
     this.trigger('endLoading')
+
+    this.initDNA()
   }
 
   setDebug() {
@@ -52,8 +54,6 @@ export default class WebGL extends EventEmitter {
 
   setScene() {
     this.scene = new THREE.Scene()
-
-    this.DNA = new SceneDNA()
   }
 
   setCamera() {
@@ -62,6 +62,10 @@ export default class WebGL extends EventEmitter {
 
   setRenderer() {
     this.renderer = new Renderer({ rendererInstance: this.rendererInstance })
+  }
+
+  initDNA() {
+    this.DNA = new SceneDNA(this)
   }
 
   appendCanvas(el) {
