@@ -13,13 +13,14 @@ import SceneDNA from './Scenes/SceneDNA.js'
 export default class WebGL extends EventEmitter {
   static instance
 
-  constructor(_options = {}) {
+  constructor() {
     super()
 
     if (WebGL.instance) {
       return WebGL.instance
     }
     WebGL.instance = this
+    this.canvas = document.querySelector('#canvasWebgl')
 
     this.started = false
 
@@ -66,10 +67,6 @@ export default class WebGL extends EventEmitter {
 
   initDNA() {
     this.DNA = new SceneDNA(this)
-  }
-
-  appendCanvas(el) {
-    el.appendChild(this.renderer.instance.domElement)
   }
 
   update() {
