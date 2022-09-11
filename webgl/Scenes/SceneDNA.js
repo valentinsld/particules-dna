@@ -1,6 +1,35 @@
 import * as THREE from 'three'
 import Raf from '../Utils/Raf.js'
 
+const options = {
+  PLANE_WIDTH: 1,
+  PLANE_HEIGHT: 10,
+  PLANE_SEGMENT: 10,
+}
+/* eslint-disable no-unused-vars */
+const vertexShader = `
+uniform float uSize;
+
+varying vec3 vColor;
+
+void main() {
+
+  vec4 mvPosition = modelViewMatrix * vec4( position, 1.0 );
+
+  gl_PointSize = uSize * ( 300.0 / -mvPosition.z );
+
+  gl_Position = projectionMatrix * mvPosition;
+
+}
+`
+
+const fragmentShader = `
+void main() {
+
+  gl_FragColor = vec4( 1.0, 1.0, 0.0 , 1.0 );
+}
+`
+
 export default class SceneDNA {
   static singleton
 
@@ -15,17 +44,27 @@ export default class SceneDNA {
   init() {
     this.instance = new THREE.Group()
 
-    this.cube = new THREE.Mesh(
-      new THREE.BoxGeometry(1, 1, 1),
-      new THREE.MeshPhysicalMaterial({
-        color: 0x00dc82,
-      })
+    const plane = new THREE.PlaneBufferGeometry(
+      options.PLANE_WIDTH,
+      options.PLANE_HEIGHT,
+      options.PLANE_WIDTH * options.PLANE_SEGMENT,
+      options.PLANE_HEIGHT * options.PLANE_SEGMENT
     )
 
-    this.light = new THREE.PointLight(0xffffff, 14, 12, 1)
-    this.light.position.copy(this.WebGL.camera.initPosition)
+    const shader = new THREE.ShaderMaterial({
+      vertexShader,
+      fragmentShader,
+      blending: THREE.AdditiveBlending,
+      depthTest: false,
+      transparent: true,
 
-    this.instance.add(...[this.light, this.cube])
+      uniforms: {
+        uSize: { value: 0.5 },
+      },
+    })
+
+    this.DNA = new THREE.Points(plane, shader)
+    this.instance.add(this.DNA)
     this.scene.add(this.instance)
   }
 }
