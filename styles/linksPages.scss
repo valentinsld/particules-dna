@@ -1,0 +1,34 @@
+.linkPage {
+  position: absolute;
+  top: 50vh;
+  left: 0;
+
+  transform: translate3d(-35%, -50%, 0) rotate(-90deg);
+
+  font-size: 20px;
+
+  padding: 12px 6px;
+
+  &::after {
+    height: 2px;
+    bottom: 10px;
+
+    transform: scaleX(1);
+  }
+
+  &:hover {
+    opacity: 0.5;
+
+    &::after {
+      transform-origin: left;
+      transform: scaleX(0);
+    }
+  }
+
+  &.-right {
+    left: inherit;
+    right: 0;
+
+    transform: translate3d(35%, -50%, 0) rotate(-90deg);
+  }
+}

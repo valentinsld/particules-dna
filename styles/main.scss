@@ -1,0 +1,73 @@
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display&display=swap');
+
+:root {
+  --font-family-sans-serif: 'DM Sans', sans-serif;
+  --font-family-serif: 'DM Serif Display', serif;
+
+  --white: #fff;
+  --black: #001e26;
+  --primary-light: #4de7a8;
+  --primary: #00dc82;
+  --primary-dark: #012a35;
+
+  --custom-ease: cubic-bezier(0.2, 0, 0.25, 1);
+}
+
+html,
+body {
+  font-size: 18px;
+  font-weight: 400;
+  letter-spacing: 0.1px;
+  font-family: var(--font-family-sans-serif);
+
+  color: var(--white);
+  background-color: var(--black);
+}
+
+*::selection {
+  color: var(--white);
+  background-color: var(--primary);
+}
+
+//
+// Style links
+//
+a {
+  position: relative;
+  color: var(--white);
+
+  text-decoration: none;
+
+  transition: opacity 400ms var(--custom-ease);
+
+  &::after {
+    content: '';
+
+    position: absolute;
+    bottom: 1px;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background-color: currentColor;
+
+    will-change: transform;
+    transition: transform 400ms var(--custom-ease);
+
+    transform-origin: right;
+    transform: scaleX(0);
+  }
+
+  &:hover {
+    &::after {
+      transform-origin: left;
+      transform: scaleX(1);
+    }
+  }
+}
+
+//
+// z-index for tweak-pane
+//
+.tp-dfwv {
+  z-index: 10000;
+}
