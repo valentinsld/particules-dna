@@ -4,7 +4,7 @@ import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import WebGL from './index.js'
 
 export default class Renderer {
-  constructor(_options = {}) {
+  constructor() {
     this.WebGL = new WebGL()
     this.debug = this.WebGL.debug
     this.stats = this.WebGL.stats
@@ -21,7 +21,7 @@ export default class Renderer {
   }
 
   setInstance() {
-    this.clearColor = '#001e26'
+    this.clearColor = '#1e1e25'
 
     // Renderer
     this.instance = new THREE.WebGLRenderer({
