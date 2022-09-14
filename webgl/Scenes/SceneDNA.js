@@ -4,7 +4,7 @@ import Raf from '../Utils/Raf.js'
 const options = {
   PLANE_WIDTH: 1,
   PLANE_HEIGHT: 10,
-  PLANE_SEGMENT: 10,
+  PLANE_SEGMENT: 40,
 }
 /* eslint-disable no-unused-vars */
 const vertexShader = `
@@ -34,7 +34,10 @@ const fragmentShader = `
 varying vec3 vColor;
 
 void main() {
-  gl_FragColor = vec4( vColor , 0.5 );
+  float dist = distance(gl_PointCoord, vec2(0.5));
+  float alpha = 1.0 - smoothstep(0.0, 0.4, dist);
+
+  gl_FragColor = vec4( vColor , alpha );
 }
 `
 
@@ -48,6 +51,7 @@ export default class SceneDNA {
     this.debug = this.WebGL.debug
 
     this.options = {
+      size: 0.4,
       colorA: '#612574',
       colorB: '#293583',
       colorC: '#1954ec',
@@ -76,7 +80,7 @@ export default class SceneDNA {
       transparent: true,
 
       uniforms: {
-        uSize: { value: 0.5 },
+        uSize: { value: this.options.size },
         uColor: { value: new THREE.Color(this.options.color) },
       },
     })
@@ -93,7 +97,7 @@ export default class SceneDNA {
     const colorC = new THREE.Color(this.options.colorC)
     console.log({ colorA, colorB, colorC })
     for (let index = 0; index < numberParticules / 3; index++) {
-      sizeArray.set([Math.random() * 0.8 + 0.1], index)
+      sizeArray[index] = Math.random()
 
       const random = Math.random()
       const colorRandom =
