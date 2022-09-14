@@ -10,6 +10,9 @@ const options = {
 const vertexShader = `
 uniform float uSize;
 
+attribute float aSize;
+attribute vec3 aColor;
+
 varying vec3 vColor;
 
 void main() {
@@ -20,16 +23,18 @@ void main() {
 
   vec4 mvPosition = modelViewMatrix * vec4(new_x, position.y, new_z, 1.0 );
 
-  gl_PointSize = uSize * ( 300.0 / -mvPosition.z );
+  gl_PointSize = uSize * aSize * ( 300.0 / -mvPosition.z );
   gl_Position = projectionMatrix * mvPosition;
+
+  vColor = aColor;
 }
 `
 
 const fragmentShader = `
-uniform vec3 uColor;
+varying vec3 vColor;
 
 void main() {
-  gl_FragColor = vec4( uColor , 1.0 );
+  gl_FragColor = vec4( vColor , 0.5 );
 }
 `
 
@@ -43,7 +48,9 @@ export default class SceneDNA {
     this.debug = this.WebGL.debug
 
     this.options = {
-      color: '#060a16',
+      colorA: '#612574',
+      colorB: '#293583',
+      colorC: '#1954ec',
     }
 
     this.init()
@@ -52,6 +59,7 @@ export default class SceneDNA {
   init() {
     this.instance = new THREE.Group()
 
+    // create plane
     const plane = new THREE.PlaneBufferGeometry(
       options.PLANE_WIDTH,
       options.PLANE_HEIGHT,
@@ -59,6 +67,7 @@ export default class SceneDNA {
       options.PLANE_HEIGHT * options.PLANE_SEGMENT
     )
 
+    // create shader
     const shader = new THREE.ShaderMaterial({
       vertexShader,
       fragmentShader,
@@ -72,14 +81,33 @@ export default class SceneDNA {
       },
     })
 
-    if (this.debug) {
-      const folder = this.debug.addFolder({ title: 'DNA' })
+    // add random size & color
+    const numberParticules = plane.attributes.position.array.length
+    console.log(numberParticules)
 
-      folder.addInput(this.options, 'color').on('change', (v) => {
-        shader.uniforms.uColor.value = new THREE.Color(v.value)
-        console.log(shader.uniforms.uColor.value, v)
-      })
+    const sizeArray = new Float32Array(numberParticules / 3)
+    const colorArray = new Float32Array(numberParticules)
+
+    const colorA = new THREE.Color(this.options.colorA)
+    const colorB = new THREE.Color(this.options.colorB)
+    const colorC = new THREE.Color(this.options.colorC)
+    console.log({ colorA, colorB, colorC })
+    for (let index = 0; index < numberParticules / 3; index++) {
+      sizeArray.set([Math.random() * 0.8 + 0.1], index)
+
+      const random = Math.random()
+      const colorRandom =
+        random > 0.66 ? colorA : random > 0.33 ? colorB : colorC
+      colorArray[index * 3] = colorRandom.r
+      colorArray[index * 3 + 1] = colorRandom.g
+      colorArray[index * 3 + 2] = colorRandom.b
     }
+
+    console.log(colorArray)
+    console.log(plane.attributes)
+
+    plane.setAttribute('aSize', new THREE.BufferAttribute(sizeArray, 1))
+    plane.setAttribute('aColor', new THREE.BufferAttribute(colorArray, 3))
 
     this.DNA = new THREE.Points(plane, shader)
     this.instance.add(this.DNA)
