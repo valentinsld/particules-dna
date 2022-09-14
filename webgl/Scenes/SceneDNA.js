@@ -119,6 +119,7 @@ export default class SceneDNA {
 
     this.instance.add(this.DNA)
     this.scene.add(this.instance)
+    this.scene.rotation.z = -0.16
   }
 
   update(time) {
