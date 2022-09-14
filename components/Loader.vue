@@ -103,11 +103,11 @@ export default {
 
     &,
     &::-webkit-progress-bar {
-      background-color: var(--white);
+      background-color: rgba(255, 255, 255, 0.3);
     }
     &::-webkit-progress-value,
     &::-moz-progress-bar {
-      background-color: var(--primary);
+      background-color: var(--white);
     }
   }
 

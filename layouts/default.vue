@@ -1,6 +1,6 @@
 <template>
   <div>
-    <!-- TODO : <Loader /> -->
+    <Loader />
 
     <Nuxt style="position: relative; z-index: 1" />
 
