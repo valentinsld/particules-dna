@@ -1,4 +1,5 @@
 import * as THREE from 'three'
+import { lerp } from '../Utils/Lerp.js'
 import Raf from '../Utils/Raf.js'
 
 const options = {
@@ -57,7 +58,12 @@ export default class SceneDNA {
       colorC: '#1954ec',
     }
 
+    this.rotation = 0
+    this.rotationTarget = 0
+
     this.init()
+
+    this.Raf.suscribe('DNA', this.update.bind(this))
   }
 
   init() {
@@ -113,5 +119,10 @@ export default class SceneDNA {
 
     this.instance.add(this.DNA)
     this.scene.add(this.instance)
+  }
+
+  update(time) {
+    this.rotation = lerp(this.rotation, this.rotationTarget, 0.1)
+    this.DNA.rotation.y = (time + this.rotation) * 0.3
   }
 }

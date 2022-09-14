@@ -20,6 +20,11 @@ body {
 
   color: var(--white);
   background-color: var(--black);
+
+  min-width: 100vw;
+  min-height: 100vh;
+  padding: 0;
+  margin: 0;
 }
 
 *::selection {
