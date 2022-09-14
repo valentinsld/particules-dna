@@ -12,8 +12,8 @@ export default class Camera {
 
     this.initPosition = {
       x: 0,
-      y: 7,
-      z: 7,
+      y: 0,
+      z: 5.5,
     }
 
     this.setInstance()

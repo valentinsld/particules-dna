@@ -4,7 +4,7 @@ import Raf from '../Utils/Raf.js'
 const options = {
   PLANE_WIDTH: 1,
   PLANE_HEIGHT: 10,
-  PLANE_SEGMENT: 40,
+  PLANE_SEGMENT: 50,
 }
 /* eslint-disable no-unused-vars */
 const vertexShader = `
@@ -51,7 +51,7 @@ export default class SceneDNA {
     this.debug = this.WebGL.debug
 
     this.options = {
-      size: 0.4,
+      size: 0.3,
       colorA: '#612574',
       colorB: '#293583',
       colorC: '#1954ec',
@@ -87,7 +87,6 @@ export default class SceneDNA {
 
     // add random size & color
     const numberParticules = plane.attributes.position.array.length
-    console.log(numberParticules)
 
     const sizeArray = new Float32Array(numberParticules / 3)
     const colorArray = new Float32Array(numberParticules)
@@ -95,7 +94,6 @@ export default class SceneDNA {
     const colorA = new THREE.Color(this.options.colorA)
     const colorB = new THREE.Color(this.options.colorB)
     const colorC = new THREE.Color(this.options.colorC)
-    console.log({ colorA, colorB, colorC })
     for (let index = 0; index < numberParticules / 3; index++) {
       sizeArray[index] = Math.random()
 
@@ -107,13 +105,12 @@ export default class SceneDNA {
       colorArray[index * 3 + 2] = colorRandom.b
     }
 
-    console.log(colorArray)
-    console.log(plane.attributes)
-
     plane.setAttribute('aSize', new THREE.BufferAttribute(sizeArray, 1))
     plane.setAttribute('aColor', new THREE.BufferAttribute(colorArray, 3))
 
     this.DNA = new THREE.Points(plane, shader)
+    this.DNA.position.x = 1.1
+
     this.instance.add(this.DNA)
     this.scene.add(this.instance)
   }
