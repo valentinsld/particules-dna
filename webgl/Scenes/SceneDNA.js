@@ -4,7 +4,7 @@ import Raf from '../Utils/Raf.js'
 
 const options = {
   PLANE_WIDTH: 1,
-  PLANE_HEIGHT: 10,
+  PLANE_HEIGHT: 4,
   PLANE_SEGMENT: 50,
 }
 /* eslint-disable no-unused-vars */
@@ -15,6 +15,7 @@ attribute float aSize;
 attribute vec3 aColor;
 
 varying vec3 vColor;
+varying vec2 vUv;
 
 void main() {
   // rotation
@@ -28,15 +29,20 @@ void main() {
   gl_Position = projectionMatrix * mvPosition;
 
   vColor = aColor;
+  vUv = uv;
 }
 `
 
 const fragmentShader = `
 varying vec3 vColor;
+varying vec2 vUv;
 
 void main() {
   float dist = distance(gl_PointCoord, vec2(0.5));
   float alpha = 1.0 - smoothstep(0.0, 0.4, dist);
+
+  // gradient bottom
+  alpha *= smoothstep(0.2, 0.5, vUv.y);
 
   gl_FragColor = vec4( vColor , alpha );
 }
