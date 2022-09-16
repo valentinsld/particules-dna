@@ -1,7 +1,7 @@
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
-    title: 'Boilerplate Nuxt-ThreeJS | by Valentin Sld',
+    title: 'Particules DNA | by Valentin Sld',
     htmlAttrs: {
       lang: 'en',
     },
