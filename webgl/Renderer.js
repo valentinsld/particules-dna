@@ -24,7 +24,7 @@ export default class Renderer {
       renderPostProcess: true,
       clearColor: '#030303',
       exposure: 2,
-      bloomStrength: 0.72,
+      bloomStrength: 1.2,
       bloomThreshold: 0.2,
       bloomRadius: 2,
     }

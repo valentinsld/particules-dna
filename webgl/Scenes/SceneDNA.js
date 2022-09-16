@@ -116,7 +116,7 @@ varying vec2 vUv;
 
 void main() {
   float dist = distance(gl_PointCoord, vec2(0.5));
-  float alpha = 1.0 - smoothstep(0.0, 0.4, dist);
+  float alpha = 1.0 - smoothstep(-0.8, 0.53, dist);
 
   // gradient bottom
   alpha *= smoothstep(0.2, 0.5, vUv.y) * 0.6;
@@ -135,7 +135,7 @@ export default class SceneDNA {
     this.debug = this.WebGL.debug
 
     this.options = {
-      size: 0.3,
+      size: 0.34,
       colorA: '#612574',
       colorB: '#293583',
       colorC: '#1954ec',
