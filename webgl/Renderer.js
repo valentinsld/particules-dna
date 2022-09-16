@@ -3,6 +3,8 @@ import * as THREE from 'three'
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
 import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+import { ShaderPass } from 'three/examples/jsm/postprocessing/ShaderPass.js'
+import AberrationShader from './PostProcess/AberationShader.js'
 
 import WebGL from './index.js'
 
@@ -27,6 +29,7 @@ export default class Renderer {
       bloomStrength: 1.2,
       bloomThreshold: 0.2,
       bloomRadius: 2,
+      afterImage: 0.65,
     }
 
     this.setInstance()
@@ -83,8 +86,11 @@ export default class Renderer {
     this.bloomPass.strength = this.options.bloomStrength
     this.bloomPass.radius = this.options.bloomRadius
 
+    this.aberation = new ShaderPass(AberrationShader)
+
     this.composer = new EffectComposer(this.instance)
     this.composer.addPass(this.renderScene)
+    this.composer.addPass(this.aberation)
     this.composer.addPass(this.bloomPass)
 
     if (!this.debug) return

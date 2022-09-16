@@ -199,7 +199,7 @@ export default class SceneDNA {
     plane.setAttribute('aColor', new THREE.BufferAttribute(colorArray, 3))
 
     this.DNA = new THREE.Points(plane, shader)
-    this.DNA.position.x = 1
+    this.DNA.position.x = 0.85
 
     this.instance.add(this.DNA)
     this.scene.add(this.instance)
