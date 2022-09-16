@@ -15,7 +15,8 @@ export default {
   methods: {
     initScroll() {
       window.addEventListener('wheel', (ev) => {
-        this.DNA.rotationTarget += ev.wheelDelta * 0.01
+        this.DNA.rotationTarget +=
+          Math.max(Math.min(ev.wheelDelta, 40), -40) * 0.01
       })
     },
   },
