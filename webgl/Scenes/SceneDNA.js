@@ -3,7 +3,7 @@ import { lerp } from '../Utils/Lerp.js'
 import Raf from '../Utils/Raf.js'
 
 const options = {
-  PLANE_WIDTH: 1,
+  PLANE_WIDTH: 1.25,
   PLANE_HEIGHT: 4,
   PLANE_SEGMENT: 50,
 }
@@ -95,7 +95,7 @@ float snoise(vec3 v){
 
 void main() {
   // rotation
-  float rotation = position.y;
+  float rotation = position.y * 1.4;
   float new_x = position.x*cos(rotation) - position.z*sin(rotation);
   float new_z = position.z*cos(rotation) + position.x*sin(rotation);
 
@@ -199,7 +199,7 @@ export default class SceneDNA {
     plane.setAttribute('aColor', new THREE.BufferAttribute(colorArray, 3))
 
     this.DNA = new THREE.Points(plane, shader)
-    this.DNA.position.x = 1.1
+    this.DNA.position.x = 1
 
     this.instance.add(this.DNA)
     this.scene.add(this.instance)
