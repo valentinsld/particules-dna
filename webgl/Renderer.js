@@ -1,6 +1,9 @@
 import * as THREE from 'three'
+
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
+import { UnrealBloomPass } from 'three/examples/jsm/postprocessing/UnrealBloomPass.js'
+
 import WebGL from './index.js'
 
 export default class Renderer {
@@ -17,12 +20,19 @@ export default class Renderer {
       this.debugFolder = this.debug.addFolder({ title: 'renderer' })
     }
 
+    this.options = {
+      renderPostProcess: true,
+      clearColor: '#030303',
+      exposure: 2,
+      bloomStrength: 0.72,
+      bloomThreshold: 0.2,
+      bloomRadius: 2,
+    }
+
     this.setInstance()
   }
 
   setInstance() {
-    this.clearColor = '#1e1e25'
-
     // Renderer
     this.instance = new THREE.WebGLRenderer({
       alpha: false,
@@ -35,7 +45,7 @@ export default class Renderer {
     this.instance.domElement.style.width = '100%'
     this.instance.domElement.style.height = '100%'
 
-    this.instance.setClearColor(this.clearColor, 1)
+    this.instance.setClearColor(this.options.clearColor, 1)
     this.instance.setSize(this.sizes.width, this.sizes.height)
     this.instance.setPixelRatio(this.sizes.pixelRatio)
 
@@ -51,46 +61,57 @@ export default class Renderer {
 
     // Debug
     if (this.debug) {
-      this.debugFolder.addInput(this, 'clearColor').on('change', () => {
-        this.instance.setClearColor(this.clearColor)
+      this.debugFolder.addInput(this.options, 'clearColor').on('change', () => {
+        this.instance.setClearColor(this.options.clearColor)
       })
+      this.debugFolder.addInput(this.options, 'renderPostProcess')
     }
+
+    this.setPostProcess()
   }
 
   setPostProcess() {
-    this.postProcess = {}
+    this.renderScene = new RenderPass(this.scene, this.camera.instance)
 
-    /**
-     * Render pass
-     */
-    this.postProcess.renderPass = new RenderPass(
-      this.scene,
-      this.camera.instance
+    this.bloomPass = new UnrealBloomPass(
+      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      1.5,
+      0.4,
+      0.85
     )
+    this.bloomPass.threshold = this.options.bloomThreshold
+    this.bloomPass.strength = this.options.bloomStrength
+    this.bloomPass.radius = this.options.bloomRadius
 
-    /**
-     * Effect composer
-     */
-    this.renderTarget = new THREE.WebGLRenderTarget(
-      this.sizes.width,
-      this.sizes.height,
-      {
-        generateMipmaps: false,
-        minFilter: THREE.LinearFilter,
-        magFilter: THREE.LinearFilter,
-        format: THREE.RGBFormat,
-        encoding: THREE.sRGBEncoding,
-        samples: 2,
-      }
-    )
-    this.postProcess.composer = new EffectComposer(
-      this.instance,
-      this.renderTarget
-    )
-    this.postProcess.composer.setSize(this.sizes.width, this.sizes.height)
-    this.postProcess.composer.setPixelRatio(this.sizes.pixelRatio)
+    this.composer = new EffectComposer(this.instance)
+    this.composer.addPass(this.renderScene)
+    this.composer.addPass(this.bloomPass)
 
-    this.postProcess.composer.addPass(this.postProcess.renderPass)
+    if (!this.debug) return
+
+    this.debugFolder
+      .addInput(this.options, 'exposure', { min: 0.1, max: 2 })
+      .on('change', (ev) => {
+        this.instance.toneMappingExposure = Math.pow(ev.value, 4.0)
+      })
+
+    this.debugFolder
+      .addInput(this.options, 'bloomThreshold', { min: 0.0, max: 1.0 })
+      .on('change', (ev) => {
+        this.bloomPass.threshold = Number(ev.value)
+      })
+
+    this.debugFolder
+      .addInput(this.options, 'bloomStrength', { min: 0.0, max: 3.0 })
+      .on('change', (ev) => {
+        this.bloomPass.strength = Number(ev.value)
+      })
+
+    this.debugFolder
+      .addInput(this.options, 'bloomRadius', { min: 0.0, max: 1.0 })
+      .on('change', (ev) => {
+        this.bloomPass.radius = Number(ev.value)
+      })
   }
 
   resize() {
@@ -99,8 +120,8 @@ export default class Renderer {
     this.instance.setPixelRatio(this.sizes.pixelRatio)
 
     // Post process
-    // this.postProcess.composer.setSize(this.sizes.width, this.sizes.height)
-    // this.postProcess.composer.setPixelRatio(this.sizes.pixelRatio)
+    this.composer.setSize(this.sizes.width, this.sizes.height)
+    this.composer.setPixelRatio(this.sizes.pixelRatio)
   }
 
   update() {
@@ -108,11 +129,11 @@ export default class Renderer {
       this.stats.beforeRender()
     }
 
-    // if (this.usePostprocess) {
-    //   this.postProcess.composer.render()
-    // } else {
-    this.instance.render(this.scene, this.camera.instance)
-    // }
+    if (this.options.renderPostProcess) {
+      this.composer.render(this.scene, this.camera.instance)
+    } else {
+      this.instance.render(this.scene, this.camera.instance)
+    }
 
     if (this.stats) {
       this.stats.afterRender()

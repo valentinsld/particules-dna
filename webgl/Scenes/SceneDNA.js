@@ -119,7 +119,7 @@ void main() {
   float alpha = 1.0 - smoothstep(0.0, 0.4, dist);
 
   // gradient bottom
-  alpha *= smoothstep(0.2, 0.5, vUv.y);
+  alpha *= smoothstep(0.2, 0.5, vUv.y) * 0.6;
 
   gl_FragColor = vec4( vColor , alpha );
 }
