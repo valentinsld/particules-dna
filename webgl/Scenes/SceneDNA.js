@@ -208,7 +208,17 @@ export default class SceneDNA {
 
   update(time) {
     this.rotation = lerp(this.rotation, this.rotationTarget, 0.1)
-    this.DNA.rotation.y = (time + this.rotation) * 0.3
+    const rotation = (time + this.rotation) * 0.3
+    this.DNA.rotation.y = rotation
     this.DNA.material.uniforms.uTime.value = time * 0.3
+
+    if (this.scrollEL) this.scrollEL.style.transform = `rotate(${rotation}rad)`
+  }
+
+  // add scrollEL
+  addScrollElement(el) {
+    if (!el) return
+
+    this.scrollEL = el
   }
 }

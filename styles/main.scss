@@ -1,21 +1,21 @@
-@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500&family=DM+Serif+Display&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400&display=swap');
 :root {
-  --font-family-sans-serif: 'DM Sans', sans-serif;
+  --font-family-sans-serif: 'Roboto', sans-serif;
   --font-family-serif: 'DM Serif Display', serif;
 
   --white: #fff;
-  --black: #1e1e25;
-  --primary: #1954ec;
+  --black: #1c1c1c;
+  --primaryLight: #1954ec;
+  --primary: #293583;
 
   --custom-ease: cubic-bezier(0.2, 0, 0.25, 1);
 }
 
 html,
 body {
-  font-size: 18px;
-  font-weight: 400;
-  letter-spacing: 0.1px;
+  font-size: 20px;
+  font-weight: 300;
+  letter-spacing: 0.5px;
   font-family: var(--font-family-sans-serif);
 
   color: var(--white);
@@ -41,29 +41,31 @@ a {
 
   text-decoration: none;
 
-  transition: opacity 400ms var(--custom-ease);
+  transition: color 250ms var(--custom-ease);
 
   &::after {
     content: '';
 
     position: absolute;
-    bottom: 1px;
+    bottom: 2px;
     left: 0;
     right: 0;
     height: 1px;
     background-color: currentColor;
 
     will-change: transform;
-    transition: transform 400ms var(--custom-ease);
+    transition: transform 250ms var(--custom-ease);
 
-    transform-origin: right;
-    transform: scaleX(0);
+    transform-origin: left;
+    transform: scaleX(1);
   }
 
   &:hover {
+    color: var(--primaryLight);
+
     &::after {
-      transform-origin: left;
-      transform: scaleX(1);
+      transform-origin: right;
+      transform: scaleX(0);
     }
   }
 }
