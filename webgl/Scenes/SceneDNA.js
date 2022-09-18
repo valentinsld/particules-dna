@@ -2,12 +2,6 @@ import * as THREE from 'three'
 import { lerp } from '../Utils/Lerp.js'
 import Raf from '../Utils/Raf.js'
 
-const options = {
-  PLANE_WIDTH: 1.25,
-  PLANE_HEIGHT: 4,
-  PLANE_SEGMENT: 50,
-}
-/* eslint-disable no-unused-vars */
 const vertexShader = `
 uniform float uTime;
 uniform float uSize;
@@ -109,7 +103,6 @@ void main() {
   vUv = uv;
 }
 `
-
 const fragmentShader = `
 varying vec3 vColor;
 varying vec2 vUv;
@@ -125,6 +118,37 @@ void main() {
 }
 `
 
+const particlesVertexShader = `
+uniform float uTime;
+uniform float uSize;
+
+attribute float aSize;
+attribute vec3 aColor;
+
+varying vec3 vColor;
+
+void main() {
+  vec4 mvPosition = modelViewMatrix * vec4(position, 1.0 );
+  mvPosition.y = mod(mvPosition.y + uTime, 6.0) - 3.0;
+
+  gl_PointSize = uSize * aSize * ( 300.0 / -mvPosition.z );
+  gl_Position = projectionMatrix * mvPosition;
+
+  vColor = aColor;
+}
+`
+
+const particlesFragmentShader = `
+varying vec3 vColor;
+
+void main() {
+  float dist = distance(gl_PointCoord, vec2(0.5));
+  float alpha = (1.0 - smoothstep(-0.8, 0.33, dist)) * 0.5;
+
+  gl_FragColor = vec4( vColor , alpha );
+}
+`
+
 export default class SceneDNA {
   static singleton
 
@@ -135,10 +159,14 @@ export default class SceneDNA {
     this.debug = this.WebGL.debug
 
     this.options = {
+      PLANE_WIDTH: 1.25,
+      PLANE_HEIGHT: 4,
+      PLANE_SEGMENT: 50,
       size: 0.34,
       colorA: '#612574',
       colorB: '#293583',
       colorC: '#1954ec',
+      particlesNumber: 300,
     }
 
     this.rotation = 0
@@ -154,10 +182,10 @@ export default class SceneDNA {
 
     // create plane
     const plane = new THREE.PlaneBufferGeometry(
-      options.PLANE_WIDTH,
-      options.PLANE_HEIGHT,
-      options.PLANE_WIDTH * options.PLANE_SEGMENT,
-      options.PLANE_HEIGHT * options.PLANE_SEGMENT
+      this.options.PLANE_WIDTH,
+      this.options.PLANE_HEIGHT,
+      this.options.PLANE_WIDTH * this.options.PLANE_SEGMENT,
+      this.options.PLANE_HEIGHT * this.options.PLANE_SEGMENT
     )
 
     // create shader
@@ -171,20 +199,19 @@ export default class SceneDNA {
       uniforms: {
         uTime: { value: 0 },
         uSize: { value: this.options.size },
-        uColor: { value: new THREE.Color(this.options.color) },
       },
     })
 
     // add random size & color
-    const numberParticules = plane.attributes.position.array.length
+    const numberparticles = plane.attributes.position.array.length
 
-    const sizeArray = new Float32Array(numberParticules / 3)
-    const colorArray = new Float32Array(numberParticules)
+    const sizeArray = new Float32Array(numberparticles / 3)
+    const colorArray = new Float32Array(numberparticles)
 
     const colorA = new THREE.Color(this.options.colorA)
     const colorB = new THREE.Color(this.options.colorB)
     const colorC = new THREE.Color(this.options.colorC)
-    for (let index = 0; index < numberParticules / 3; index++) {
+    for (let index = 0; index < numberparticles / 3; index++) {
       sizeArray[index] = Math.random()
 
       const random = Math.random()
@@ -199,18 +226,73 @@ export default class SceneDNA {
     plane.setAttribute('aColor', new THREE.BufferAttribute(colorArray, 3))
 
     this.DNA = new THREE.Points(plane, shader)
-    this.DNA.position.x = 0.85
+
+    // add particles
+    const particlesGeometry = new THREE.BufferGeometry()
+    const particlesNumber = this.options.particlesNumber
+    const particlesPositions = new Float32Array(particlesNumber * 3)
+    const particlesSize = new Float32Array(numberparticles)
+    const particlesColors = new Float32Array(particlesNumber * 3)
+
+    for (let index = 0; index < particlesNumber; index++) {
+      particlesPositions[index * 3] =
+        (Math.random() - 0.5) * this.options.PLANE_WIDTH * 2
+      particlesPositions[index * 3 + 1] =
+        (Math.random() - 0.5) * this.options.PLANE_HEIGHT * 2
+      particlesPositions[index * 3 + 2] = (Math.random() - 0.5) * 2
+
+      particlesSize[index] = Math.random() * 2
+
+      const random = Math.random()
+      const colorRandom =
+        random > 0.66 ? colorA : random > 0.33 ? colorB : colorC
+      particlesColors[index * 3] = colorRandom.r
+      particlesColors[index * 3 + 1] = colorRandom.g
+      particlesColors[index * 3 + 2] = colorRandom.b
+    }
+    particlesGeometry.setAttribute(
+      'position',
+      new THREE.BufferAttribute(particlesPositions, 3)
+    )
+    particlesGeometry.setAttribute(
+      'aSize',
+      new THREE.BufferAttribute(particlesSize, 1)
+    )
+    particlesGeometry.setAttribute(
+      'aColor',
+      new THREE.BufferAttribute(particlesColors, 3)
+    )
+
+    const particlesMaterial = new THREE.ShaderMaterial({
+      vertexShader: particlesVertexShader,
+      fragmentShader: particlesFragmentShader,
+      blending: THREE.AdditiveBlending,
+      depthTest: false,
+      transparent: true,
+
+      uniforms: {
+        uTime: { value: 0 },
+        uSize: { value: this.options.size },
+      },
+    })
+
+    this.particles = new THREE.Points(particlesGeometry, particlesMaterial)
 
     this.instance.add(this.DNA)
+    this.instance.add(this.particles)
+
     this.scene.add(this.instance)
+    this.scene.position.x = 0.85
     this.scene.rotation.z = -0.16
   }
 
   update(time) {
     this.rotation = lerp(this.rotation, this.rotationTarget, 0.1)
     const rotation = (time + this.rotation) * 0.3
-    this.DNA.rotation.y = rotation
+    this.instance.rotation.y = rotation
+
     this.DNA.material.uniforms.uTime.value = time * 0.3
+    this.particles.material.uniforms.uTime.value = time * 0.1
 
     if (this.scrollEL) this.scrollEL.style.transform = `rotate(${rotation}rad)`
   }
