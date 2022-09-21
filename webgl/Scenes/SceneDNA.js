@@ -1,4 +1,13 @@
-import * as THREE from 'three'
+import {
+  Group,
+  PlaneBufferGeometry,
+  ShaderMaterial,
+  AdditiveBlending,
+  Color,
+  BufferAttribute,
+  Points,
+  BufferGeometry,
+} from 'three'
 import { lerp } from '../Utils/Lerp.js'
 import Raf from '../Utils/Raf.js'
 
@@ -178,10 +187,10 @@ export default class SceneDNA {
   }
 
   init() {
-    this.instance = new THREE.Group()
+    this.instance = new Group()
 
     // create plane
-    const plane = new THREE.PlaneBufferGeometry(
+    const plane = new PlaneBufferGeometry(
       this.options.PLANE_WIDTH,
       this.options.PLANE_HEIGHT,
       this.options.PLANE_WIDTH * this.options.PLANE_SEGMENT,
@@ -189,10 +198,10 @@ export default class SceneDNA {
     )
 
     // create shader
-    const shader = new THREE.ShaderMaterial({
+    const shader = new ShaderMaterial({
       vertexShader,
       fragmentShader,
-      blending: THREE.AdditiveBlending,
+      blending: AdditiveBlending,
       depthTest: false,
       transparent: true,
 
@@ -208,9 +217,9 @@ export default class SceneDNA {
     const sizeArray = new Float32Array(numberparticles / 3)
     const colorArray = new Float32Array(numberparticles)
 
-    const colorA = new THREE.Color(this.options.colorA)
-    const colorB = new THREE.Color(this.options.colorB)
-    const colorC = new THREE.Color(this.options.colorC)
+    const colorA = new Color(this.options.colorA)
+    const colorB = new Color(this.options.colorB)
+    const colorC = new Color(this.options.colorC)
     for (let index = 0; index < numberparticles / 3; index++) {
       sizeArray[index] = Math.random()
 
@@ -222,13 +231,13 @@ export default class SceneDNA {
       colorArray[index * 3 + 2] = colorRandom.b
     }
 
-    plane.setAttribute('aSize', new THREE.BufferAttribute(sizeArray, 1))
-    plane.setAttribute('aColor', new THREE.BufferAttribute(colorArray, 3))
+    plane.setAttribute('aSize', new BufferAttribute(sizeArray, 1))
+    plane.setAttribute('aColor', new BufferAttribute(colorArray, 3))
 
-    this.DNA = new THREE.Points(plane, shader)
+    this.DNA = new Points(plane, shader)
 
     // add particles
-    const particlesGeometry = new THREE.BufferGeometry()
+    const particlesGeometry = new BufferGeometry()
     const particlesNumber = this.options.particlesNumber
     const particlesPositions = new Float32Array(particlesNumber * 3)
     const particlesSize = new Float32Array(numberparticles)
@@ -252,21 +261,21 @@ export default class SceneDNA {
     }
     particlesGeometry.setAttribute(
       'position',
-      new THREE.BufferAttribute(particlesPositions, 3)
+      new BufferAttribute(particlesPositions, 3)
     )
     particlesGeometry.setAttribute(
       'aSize',
-      new THREE.BufferAttribute(particlesSize, 1)
+      new BufferAttribute(particlesSize, 1)
     )
     particlesGeometry.setAttribute(
       'aColor',
-      new THREE.BufferAttribute(particlesColors, 3)
+      new BufferAttribute(particlesColors, 3)
     )
 
-    const particlesMaterial = new THREE.ShaderMaterial({
+    const particlesMaterial = new ShaderMaterial({
       vertexShader: particlesVertexShader,
       fragmentShader: particlesFragmentShader,
-      blending: THREE.AdditiveBlending,
+      blending: AdditiveBlending,
       depthTest: false,
       transparent: true,
 
@@ -276,7 +285,7 @@ export default class SceneDNA {
       },
     })
 
-    this.particles = new THREE.Points(particlesGeometry, particlesMaterial)
+    this.particles = new Points(particlesGeometry, particlesMaterial)
 
     this.instance.add(this.DNA)
     this.instance.add(this.particles)

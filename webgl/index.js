@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import { AxesHelper, Scene } from 'three'
 import { Pane } from 'tweakpane'
 
 import Sizes from './Utils/Sizes.js'
@@ -48,13 +48,13 @@ export default class WebGL extends EventEmitter {
       this.debug = new Pane()
       this.stats = new Stats(true)
 
-      const axesHelper = new THREE.AxesHelper(5)
+      const axesHelper = new AxesHelper(5)
       this.scene.add(axesHelper)
     }
   }
 
   setScene() {
-    this.scene = new THREE.Scene()
+    this.scene = new Scene()
   }
 
   setCamera() {

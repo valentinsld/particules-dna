@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import { WebGLRenderer, sRGBEncoding, NoToneMapping, Vector2 } from 'three'
 
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js'
 import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js'
@@ -37,7 +37,7 @@ export default class Renderer {
 
   setInstance() {
     // Renderer
-    this.instance = new THREE.WebGLRenderer({
+    this.instance = new WebGLRenderer({
       alpha: false,
       antialias: true,
       canvas: this.WebGL.canvas,
@@ -54,10 +54,10 @@ export default class Renderer {
 
     this.instance.physicallyCorrectLights = true
     // this.instance.gammaOutPut = true
-    this.instance.outputEncoding = THREE.sRGBEncoding
-    // this.instance.shadowMap.type = THREE.PCFSoftShadowMap
+    this.instance.outputEncoding = sRGBEncoding
+    // this.instance.shadowMap.type = PCFSoftShadowMap
     // this.instance.shadowMap.enabled = false
-    this.instance.toneMapping = THREE.NoToneMapping
+    this.instance.toneMapping = NoToneMapping
     this.instance.toneMappingExposure = 1
 
     this.context = this.instance.getContext()
@@ -77,7 +77,7 @@ export default class Renderer {
     this.renderScene = new RenderPass(this.scene, this.camera.instance)
 
     this.bloomPass = new UnrealBloomPass(
-      new THREE.Vector2(window.innerWidth, window.innerHeight),
+      new Vector2(window.innerWidth, window.innerHeight),
       1.5,
       0.4,
       0.85

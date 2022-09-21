@@ -1,3 +1,5 @@
+const path = require('path')
+
 export default {
   // Global page headers: https://go.nuxtjs.dev/config-head
   head: {
@@ -37,6 +39,40 @@ export default {
 
   // Build Configuration: https://go.nuxtjs.dev/config-build
   build: {
+    analyze: true,
+    babel: {
+      presets: ['@babel/preset-env'],
+      compact: true,
+    },
+    compact: true,
+
+    optimization: {
+      usedExports: true,
+
+      splitChunks: {
+        chunks: 'async',
+        minSize: 30000,
+        maxSize: 0,
+        minChunks: 1,
+        maxAsyncRequests: 5,
+        maxInitialRequests: 3,
+        automaticNameDelimiter: '~',
+        automaticNameMaxLength: 30,
+        name: true,
+        cacheGroups: {
+          vendors: {
+            test: /[\\/]node_modules[\\/]/,
+            priority: -10,
+          },
+          default: {
+            minChunks: 2,
+            priority: -20,
+            reuseExistingChunk: true,
+          },
+        },
+      },
+    },
+
     transpile: ['three'],
   },
 

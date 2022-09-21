@@ -1,4 +1,4 @@
-import * as THREE from 'three'
+import { PerspectiveCamera } from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import WebGL from './index.js'
 
@@ -22,7 +22,7 @@ export default class Camera {
 
   setInstance() {
     // Set up
-    this.instance = new THREE.PerspectiveCamera(
+    this.instance = new PerspectiveCamera(
       25,
       this.sizes.width / this.sizes.height,
       0.1,
