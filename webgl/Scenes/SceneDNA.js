@@ -1,6 +1,6 @@
 import {
   Group,
-  PlaneBufferGeometry,
+  PlaneGeometry,
   ShaderMaterial,
   AdditiveBlending,
   Color,
@@ -190,7 +190,7 @@ export default class SceneDNA {
     this.instance = new Group()
 
     // create plane
-    const plane = new PlaneBufferGeometry(
+    const plane = new PlaneGeometry(
       this.options.PLANE_WIDTH,
       this.options.PLANE_HEIGHT,
       this.options.PLANE_WIDTH * this.options.PLANE_SEGMENT,
